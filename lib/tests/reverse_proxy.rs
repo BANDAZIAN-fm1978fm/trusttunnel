@@ -60,9 +60,14 @@ macro_rules! reverse_proxy_tests {
 
 reverse_proxy_tests! {
     sni_h1: sni_h1_client,
-    sni_h3: sni_h3_client,
     path_h1: path_h1_client,
     path_h2: path_h2_client,
+}
+
+// TODO: [TRUST-211] Enable H3 tests on Linux when QUIC issue will be fixed.
+#[cfg(target_os = "macos")]
+reverse_proxy_tests! {
+    sni_h3: sni_h3_client,
     path_h3: path_h3_client,
 }
 
@@ -97,6 +102,7 @@ async fn path_h2_chunked() {
     }
 }
 
+#[cfg(target_os = "macos")]
 #[tokio::test]
 async fn path_h3_chunked() {
     common::set_up_logger();
@@ -160,6 +166,7 @@ async fn sni_h1_client(endpoint_address: &SocketAddr) -> (http::response::Parts,
     .await
 }
 
+#[cfg(target_os = "macos")]
 async fn sni_h3_client(endpoint_address: &SocketAddr) -> (http::response::Parts, Bytes) {
     let mut conn = common::Http3Session::connect(
         endpoint_address,
@@ -218,6 +225,7 @@ async fn path_h2_client(endpoint_address: &SocketAddr) -> (http::response::Parts
     .await
 }
 
+#[cfg(target_os = "macos")]
 async fn path_h3_client(endpoint_address: &SocketAddr) -> (http::response::Parts, Bytes) {
     let mut conn =
         common::Http3Session::connect(endpoint_address, common::MAIN_DOMAIN_NAME, None).await;
